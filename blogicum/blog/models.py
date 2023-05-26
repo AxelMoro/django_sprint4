@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.urls import reverse
 
 User = get_user_model()
 
@@ -56,6 +57,9 @@ class Post(BaseModel):
         help_text=('Если установить дату и время в будущем — можно '
                    'делать отложенные публикации.')
     )
+    image = models.ImageField('Изображение',
+                              upload_to='birthdays_images', blank=True
+                              )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -83,19 +87,29 @@ class Post(BaseModel):
         verbose_name_plural = 'Публикации'
         ordering = ('-pub_date',)
 
+    def get_absolute_url(self):
+        return reverse('blog:detail.html', kwargs={'pk': self.pk})
+
     def __str__(self):
         return self.title
 
 
-class Comment(models.Model):
+class Comment(BaseModel):
     text = models.TextField('Текст комментария')
-    birthday = models.ForeignKey(
+    post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
-        related_name='comment',
+        related_name='comments',
     )
-    created_at = models.DateTimeField(auto_now_add=True)
-    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        verbose_name='Автор комментария',
+        related_name='comments'
+    )
 
     class Meta:
         ordering = ('created_at',)
+
+    def __str__(self):
+        return self.text

@@ -1,6 +1,5 @@
 from django.shortcuts import render
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+
 
 def about(request):
     template = 'pages/about.html'
@@ -20,5 +19,5 @@ def page_not_found(request, exception):
     return render(request, 'pages/404.html', status=404)
 
 
-def handler500(request, exception):
-    return render(request, 'pages/405.html', status=405)
+def handler500(request):
+    return render(request, 'pages/500.html', status=500)
