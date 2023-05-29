@@ -156,6 +156,12 @@ class PostDeleteView(LoginRequiredMixin, PostMixin, DeleteView):
     success_url = reverse_lazy('blog:index')
     pk_url_kwarg = 'post_id'
 
+    def dispatch(self, request, *args, **kwargs):
+        self.posts = get_object_or_404(Post, pk=kwargs['post_id'])
+        if self.posts.author != request.user:
+            return redirect('blog:post_detail', self.kwargs['post_id'])
+        return super().dispatch(request, *args, **kwargs)
+
 
 class CommentUpdateView(LoginRequiredMixin, CommentMixin, UpdateView):
     pass

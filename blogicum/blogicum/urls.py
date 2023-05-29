@@ -5,7 +5,6 @@ from django.contrib.auth.forms import UserCreationForm
 from django.conf import settings
 from django.conf.urls.static import static
 
-
 urlpatterns: list = [
     path('', include('blog.urls')),
     path('admin/', admin.site.urls),
