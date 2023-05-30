@@ -44,10 +44,10 @@ class IndexListView(PostMixin, ListView):
     queryset = Post.objects.prefetch_related(
         'comments'
     ).select_related('author').filter(
-            pub_date__lt=tz.now(),
-            is_published=True,
-            category__is_published=True,
-        ).annotate(comment_count=Count('comments'))
+        pub_date__lt=tz.now(),
+        is_published=True,
+        category__is_published=True,
+    ).annotate(comment_count=Count('comments'))
     template_name = 'blog/index.html'
     ordering = '-pub_date'
     paginate_by = 10
@@ -88,7 +88,7 @@ class CategoryListView(PostMixin, ListView):
             Category,
             slug=self.kwargs['category_slug'],
             is_published=True,
-            )
+        )
         return context
 
 
