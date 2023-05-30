@@ -25,7 +25,9 @@ class CommentMixin:
     pk_url_kwarg = 'comment_id'
 
     def dispatch(self, request, *args, **kwargs):
-        get_object_or_404(Post, pk=kwargs['post_id'], author=request.user)
+        instance = get_object_or_404(Comment, pk=kwargs['comment_id'])
+        if instance.author != request.user:
+            return redirect('blog:post_detail', self.kwargs['comment_id'])
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -35,7 +37,7 @@ class CommentMixin:
 
     def get_success_url(self):
         return reverse_lazy('blog:post_detail',
-                            kwargs={'pk': self.comment.pk})
+                            kwargs={'pk': self.kwargs['post_id']})
 
 
 class IndexListView(PostMixin, ListView):
