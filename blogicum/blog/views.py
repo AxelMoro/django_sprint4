@@ -55,6 +55,7 @@ class IndexListView(PostMixin, ListView):
 
 class PostDetailView(PostMixin, DetailView):
     template_name = 'blog/detail.html'
+    ordering = ('-pub_date',)
     paginate_by = 10
 
     def get_context_data(self, **kwargs):
@@ -117,7 +118,7 @@ class ProfileListView(ListView):
             author__username__exact=self.kwargs['username']
         ).annotate(
             comment_count=Count('comments')
-        )
+        ).order_by('-pub_date')
         return instance
 
     def get_context_data(self, **kwargs):
