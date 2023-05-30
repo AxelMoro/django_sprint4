@@ -1,8 +1,7 @@
 from typing import Any
 from django.db.models.query import QuerySet
-from django.shortcuts import get_object_or_404, render, redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.utils import timezone as tz
-from django.core.paginator import Paginator
 from django.db.models import Count
 from django.urls import reverse_lazy
 from blog.models import Post, User, Comment, Category
@@ -26,7 +25,7 @@ class CommentMixin:
     pk_url_kwarg = 'comment_id'
 
     def dispatch(self, request, *args, **kwargs):
-        self.comment = get_object_or_404(Post, pk=kwargs['post_id'])
+        get_object_or_404(Post, pk=kwargs['post_id'], author=request.user)
         return super().dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -91,20 +90,38 @@ class CategoryListView(PostMixin, ListView):
         return context
 
 
-@login_required
-def profile(request, username):
-    post_author = get_object_or_404(User, username=username)
-    isinstance = Post.objects.select_related('author').filter(
-            author__username=username,
+class ProfileListView(ListView):
+    model = Post
+    template_name = 'blog/profile.html'
+    ordering = 'id'
+    paginate_by = 10
+
+    def get_queryset(self):
+        instance = Post.objects.select_related(
+            'category',
+            'location',
+            'author'
+        ).only(
+            'id',
+            'title',
+            'pub_date',
+            'location',
+            'location__name',
+            'author__username',
+            'category__slug',
+            'category__title',
+            'text',
+        ).filter(
+            author__username__exact=self.kwargs['username']
+        ).annotate(
+            comment_count=Count('comments')
         )
-    paginator = Paginator(isinstance, 10)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    context = {
-        'profile': post_author,
-        'page_obj': page_obj
-        }
-    return render(request, 'blog/profile.html', context)
+        return instance
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['profile'] = User.objects.get(username=self.kwargs['username'])
+        return context
 
 
 @login_required

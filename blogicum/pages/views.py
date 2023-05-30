@@ -1,14 +1,13 @@
 from django.shortcuts import render
+from django.views.generic import ListView
 
 
-def about(request):
+class AboutListView(ListView):
     template = 'pages/about.html'
-    return render(request, template)
 
 
-def rules(request):
+class RulesListView(ListView):
     template = 'pages/rules.html'
-    return render(request, template)
 
 
 def csrf_failure(request, reason=''):
