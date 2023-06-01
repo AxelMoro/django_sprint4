@@ -95,7 +95,9 @@ class Post(BaseModel):
 
 
 class Comment(BaseModel):
-    text = models.TextField('Текст комментария')
+    text = models.TextField(
+        'Текст комментария',
+    )
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
@@ -112,4 +114,4 @@ class Comment(BaseModel):
         ordering = ('created_at',)
 
     def __str__(self):
-        return self.text
+        return self.text[:15]
