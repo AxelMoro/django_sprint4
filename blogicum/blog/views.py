@@ -106,8 +106,8 @@ class ProfileListView(ListView):
         context = super().get_context_data(**kwargs)
         context['profile'] = get_object_or_404(User, username=self.kwargs.get(
             'username'
-            )
-            )
+        )
+        )
         return context
 
     def get_queryset(self):
